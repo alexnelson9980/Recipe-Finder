@@ -36,7 +36,7 @@ public class RecipeSearchPanel extends JPanel {
 		add(label);
 		
 		JLabel lblIngredientsInclude = new JLabel("Ingredients to Include");
-		lblIngredientsInclude.setBounds(37, 43, 119, 14);
+		lblIngredientsInclude.setBounds(37, 43, 172, 14);
 		add(lblIngredientsInclude);
 		
 		JButton AddInclude = new JButton("+");
@@ -68,7 +68,7 @@ public class RecipeSearchPanel extends JPanel {
 		add(IncludeField);
 		
 		JLabel lblIngredientExclude = new JLabel("Ingredients to Exclude");
-		lblIngredientExclude.setBounds(37, 212, 119, 14);
+		lblIngredientExclude.setBounds(37, 212, 172, 14);
 		add(lblIngredientExclude);
 		
 		JButton AddExclude = new JButton("+");

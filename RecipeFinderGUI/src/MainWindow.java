@@ -30,13 +30,13 @@ public class MainWindow {
 	 * Create the application.
 	 */
 	public MainWindow(String ID) {
-		initialize();
+		initialize(ID);
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize(String ID) {
 		frmRecipeFinder = new JFrame();
 		frmRecipeFinder.setTitle("Recipe Finder");
 		frmRecipeFinder.setBounds(100, 100, 800, 600);
@@ -53,7 +53,7 @@ public class MainWindow {
 		JPanel FavoritePanel = new JPanel();
 		tabbedPane.addTab("My Favorites", null, FavoritePanel, null);
 		
-		JPanel ProfilePanel = new JPanel();
+		JPanel ProfilePanel = new ProfilePage(ID);
 		tabbedPane.addTab("Profile", null, ProfilePanel, null);
 	}
 }
