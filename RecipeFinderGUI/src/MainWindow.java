@@ -50,7 +50,7 @@ public class MainWindow {
 		tabbedPane.setBounds(10, 11, 760, 550);
 		frmRecipeFinder.getContentPane().add(tabbedPane);
 		
-		JPanel SearchPanel = new RecipeSearchPanel();
+		JPanel SearchPanel = new RecipeSearchPanel(ID);
 		tabbedPane.addTab("Recipe Search", null, SearchPanel, null);
 		
 		JScrollPane FavoritePanel = new RecipeList(ID, FavoriteQuery(ID));

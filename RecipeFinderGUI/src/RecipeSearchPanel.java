@@ -28,7 +28,7 @@ public class RecipeSearchPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public RecipeSearchPanel() {
+	public RecipeSearchPanel(String ID) {
 		setLayout(null);
 		
 		JLabel label = new JLabel("Categories");
@@ -206,6 +206,12 @@ public class RecipeSearchPanel extends JPanel {
 		JButton SearchBtn = new JButton("Search");
 		SearchBtn.setBounds(395, 416, 89, 23);
 		add(SearchBtn);
+		SearchBtn.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				GetSearchResults(ID);
+			}
+		});
 		
 		IncludeText = new JTextPane();
 		IncludeText.setEditable(false);
@@ -218,4 +224,16 @@ public class RecipeSearchPanel extends JPanel {
 		add(ExcludeText);
 
 	}
+	
+	public void GetSearchResults(String ID){
+		String query = "PB&J";
+		RecipeList list = new RecipeList(ID, query);
+		if (MainWindow.tabbedPane.getTabCount() > 3)
+		{
+			MainWindow.tabbedPane.remove(3);
+		}
+			MainWindow.tabbedPane.addTab("Search Results", list);
+			MainWindow.tabbedPane.setSelectedIndex(3);
+	}
+	
 }
