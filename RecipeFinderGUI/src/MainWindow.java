@@ -3,12 +3,15 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 public class MainWindow {
 
-	JFrame frmRecipeFinder;
+	public JFrame frmRecipeFinder;
+	public static JTabbedPane tabbedPane;
 
 	/**
 	 * Launch the application.
@@ -43,17 +46,21 @@ public class MainWindow {
 		frmRecipeFinder.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmRecipeFinder.getContentPane().setLayout(null);
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(10, 11, 760, 550);
 		frmRecipeFinder.getContentPane().add(tabbedPane);
 		
 		JPanel SearchPanel = new RecipeSearchPanel();
 		tabbedPane.addTab("Recipe Search", null, SearchPanel, null);
 		
-		JPanel FavoritePanel = new JPanel();
+		JScrollPane FavoritePanel = new RecipeList(ID, FavoriteQuery(ID));
 		tabbedPane.addTab("My Favorites", null, FavoritePanel, null);
 		
 		JPanel ProfilePanel = new ProfilePage(ID);
 		tabbedPane.addTab("Profile", null, ProfilePanel, null);
+	}
+	
+	public String FavoriteQuery(String ID) {
+		return "Macaroni and Cheese";
 	}
 }
