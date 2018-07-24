@@ -5,6 +5,8 @@ import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -17,7 +19,7 @@ public class ApplicationWindow {
 
 	private JFrame frmRecipeFinderLogin;
 	private JTextField UserIDField;
-	private JTextField PasswordField;
+	private JPasswordField PasswordField;
 	private JButton LogInButton;
 	private JButton CreateUserButton;
 	private JTextArea MessageBox;
@@ -130,7 +132,7 @@ public class ApplicationWindow {
 		frmRecipeFinderLogin.getContentPane().add(UserIDField);
 		UserIDField.setColumns(10);
 		
-		PasswordField = new JTextField();
+		PasswordField = new JPasswordField();
 		PasswordField.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent arg0) {

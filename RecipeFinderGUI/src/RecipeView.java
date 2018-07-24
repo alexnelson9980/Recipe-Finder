@@ -7,6 +7,8 @@ import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import java.awt.SystemColor;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 public class RecipeView extends JScrollPane {
 
@@ -36,6 +38,11 @@ public class RecipeView extends JScrollPane {
 		panel.add(lblMyRating);
 		
 		MyRatingSpinner = new JSpinner();
+		MyRatingSpinner.addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent arg0) {
+				UpdateUserRating(recipeID, (int) MyRatingSpinner.getValue());
+			}
+		});
 		MyRatingSpinner.setModel(new SpinnerNumberModel(0, 0, 5, 1));
 		MyRatingSpinner.setBounds(77, 8, 45, 20);
 		panel.add(MyRatingSpinner);
@@ -75,6 +82,7 @@ public class RecipeView extends JScrollPane {
 	}
 	
 	public void SetRecipeData(String recipeID) {
+		//get from db
 		MyRatingSpinner.setValue(3);
 		AppRatingVal.setText("2");
 		EpRatingVal.setText("4");
@@ -82,7 +90,11 @@ public class RecipeView extends JScrollPane {
 		DescriptionText.setText("The classic all american meal.");
 		DirectionsText.setText("Spread liquid ingredients evenly on bread. \n Enjoy.");
 		
-		
+	}
+	
+	public void UpdateUserRating(String recipeID, int rating) {
+		//send to db
+		//update avg rating from db
 	}
 
 }

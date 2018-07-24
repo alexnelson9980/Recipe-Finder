@@ -14,6 +14,9 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.JToggleButton;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.List;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JPanel;
@@ -24,6 +27,10 @@ public class RecipeSearchPanel extends JPanel {
 	private JTextField ExcludeField;
 	private JTextPane IncludeText;
 	private JTextPane ExcludeText;
+	public Hashtable<Integer,String> IncludedIngredients = new Hashtable<Integer,String>();
+	public int includedCount = 0;
+	public Hashtable<Integer,String> ExcludedIngredients = new Hashtable<Integer,String>();
+	public int excludedCount = 0;
 
 	/**
 	 * Create the panel.
@@ -43,8 +50,10 @@ public class RecipeSearchPanel extends JPanel {
 		AddInclude.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				IncludeText.setText(IncludeField.getText());
+				IncludedIngredients.put(includedCount, IncludeField.getText());
 				IncludeField.setText("");
+				includedCount++;
+				IncludeText.setText(IngredientNames(IncludedIngredients));
 				AddInclude.setEnabled(false);
 			}
 		});
@@ -75,8 +84,10 @@ public class RecipeSearchPanel extends JPanel {
 		AddExclude.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				ExcludeText.setText(ExcludeField.getText());
+				ExcludedIngredients.put(excludedCount, ExcludeField.getText());
 				ExcludeField.setText("");
+				excludedCount++;
+				ExcludeText.setText(IngredientNames(ExcludedIngredients));
 				AddExclude.setEnabled(false);
 			}
 		});
@@ -209,7 +220,26 @@ public class RecipeSearchPanel extends JPanel {
 		SearchBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				GetSearchResults(ID);
+				Dictionary<String,Integer> vals = new Hashtable<String,Integer>();
+				if (CalorieMin.isEnabled()){
+					vals.put("CalorieMin", (Integer) CalorieMin.getValue());
+					vals.put("CalorieMax", (Integer)CalorieMax.getValue());
+				}
+				if (ProteinMin.isEnabled()){
+					vals.put("ProteinMin", (Integer) ProteinMin.getValue());
+					vals.put("ProteinMax", (Integer) ProteinMax.getValue());
+				}
+				if (FatMin.isEnabled()){
+					vals.put("FatMin", (Integer) FatMin.getValue());
+					vals.put("FatMax", (Integer) FatMax.getValue());
+				}
+				if (SodiumMin.isEnabled()){
+					vals.put("SodiumMin", (Integer) SodiumMin.getValue());
+					vals.put("SodiumMax", (Integer) SodiumMax.getValue());
+				}
+
+				String cat = (String) CategoriesCombo.getSelectedItem();
+				GetSearchResults(ID,vals,IncludedIngredients,ExcludedIngredients,cat);
 			}
 		});
 		
@@ -225,7 +255,8 @@ public class RecipeSearchPanel extends JPanel {
 
 	}
 	
-	public void GetSearchResults(String ID){
+	public void GetSearchResults(String ID, Dictionary NutriVals, Dictionary Included, Dictionary Excluded, String Cat ){
+		//generate query
 		String query = "PB&J";
 		RecipeList list = new RecipeList(ID, query);
 		if (MainWindow.tabbedPane.getTabCount() > 3)
@@ -234,6 +265,14 @@ public class RecipeSearchPanel extends JPanel {
 		}
 			MainWindow.tabbedPane.addTab("Search Results", list);
 			MainWindow.tabbedPane.setSelectedIndex(3);
+	}
+	
+	public String IngredientNames(Hashtable<Integer,String> dict) {
+		String out = "";
+		for (String val: dict.values()) {
+			out.concat(val).concat("   ");
+		}
+		return out;
 	}
 	
 }

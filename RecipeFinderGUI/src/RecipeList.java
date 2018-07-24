@@ -52,29 +52,40 @@ public class RecipeList extends JScrollPane {
 				 int row=table.rowAtPoint(arg0.getPoint());
 				 int col= table.columnAtPoint(arg0.getPoint());
 				 if ((arg0.getClickCount()>1)&&(col==0)) {
-					 RowClicked(row,col);
+					 RowClicked(row);
+				 }
+				 if (col==1) {
+					 UpdateFavorite(row);
 				 }
 			 }
          });
 	}
 	
 	public Object[][] GetTableData(String query){
+		//send to db
+		//make visible grid and matching array with IDs
 		return new Object[][] {
 			{query, true},
 			{"Sandwich",true},
 		};
 	}
 		
-	public void RowClicked(int RowNum, int ColNum)
+	public void RowClicked(int RowNum)
 	{
-		String title = (String) table.getValueAt(RowNum, ColNum);
-		RecipeView recView = new RecipeView(title);
+		String title = (String) table.getValueAt(RowNum, 0);
+		//use array to get recipeID
+		RecipeView recView = new RecipeView(title); //this will be ID
 		if (MainWindow.tabbedPane.getTabCount() > 3)
 		{
 			MainWindow.tabbedPane.remove(3);
 		}
 			MainWindow.tabbedPane.addTab(title, recView);
 			MainWindow.tabbedPane.setSelectedIndex(3);
+	}
+	
+	public void UpdateFavorite(int RowNum) {
+		boolean val = (boolean) table.getValueAt(RowNum, 1);
+		//send update to db
 	}
 
 }

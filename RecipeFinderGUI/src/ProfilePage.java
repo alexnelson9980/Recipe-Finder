@@ -3,6 +3,8 @@ import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class ProfilePage extends JPanel {
 	private JPasswordField passwordField;
@@ -42,11 +44,28 @@ public class ProfilePage extends JPanel {
 		UserIDField.setBounds(166, 51, 94, 20);
 		add(UserIDField);
 		UserIDField.setColumns(10);
-		UserIDField.setText(ID);
+		
 		
 		JButton btnUpdate = new JButton("Update");
+		btnUpdate.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				UpdateUser(ID,UserNameField.getText(),passwordField.getPassword().toString());
+			}
+		});
 		btnUpdate.setBounds(171, 234, 89, 23);
 		add(btnUpdate);
 
+		populate(ID);
+	}
+	
+	public void populate(String ID) {
+		UserIDField.setText(ID);
+		passwordField.setText("password");
+		UserNameField.setText("Doug");
+	}
+	
+	public void UpdateUser(String ID, String Name, String Password) {
+		//send update to db
 	}
 }
