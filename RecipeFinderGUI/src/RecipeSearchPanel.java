@@ -104,7 +104,7 @@ public class RecipeSearchPanel extends JPanel {
 				ExcludedIngredients.put(excludedCount, ExcludeField.getText());
 				ExcludeField.setText("");
 				excludedCount++;
-				String text = IngredientNames(IncludedIngredients);
+				String text = IngredientNames(ExcludedIngredients);
 				ExcludeText.setText(text);
 				AddExclude.setEnabled(false);
 			}
