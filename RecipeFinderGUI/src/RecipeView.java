@@ -20,6 +20,7 @@ public class RecipeView extends JScrollPane {
 	JTextPane IngredientsText;
 	JTextPane DescriptionText;
 	JTextPane DirectionsText;
+	JTextPane NutritionText;
 	
 	/**
 	 * Create the panel.
@@ -79,6 +80,12 @@ public class RecipeView extends JScrollPane {
 		DirectionsText.setBounds(225, 219, 371, 274);
 		panel.add(DirectionsText);
 		
+		NutritionText = new JTextPane();
+		NutritionText.setEditable(false);
+		NutritionText.setBackground(SystemColor.info);
+		NutritionText.setBounds(603, 50, 152, 430);
+		panel.add(NutritionText);
+		
 		SetRecipeData(recipeID);
 
 	}
@@ -91,12 +98,26 @@ public class RecipeView extends JScrollPane {
 		IngredientsText.setText("2 slices of bread \n 1 tbsp peanut butter \n 1 tbsp jam");
 		DescriptionText.setText("The classic all american meal.");
 		DirectionsText.setText("Spread liquid ingredients evenly on bread. \n Enjoy.");
+		LoadNutritionText(recipeID);
 		
+	}
+	
+	public void LoadNutritionText(String RecipeID) {
+		//query for values:
+		String cals = "150";
+		String fat = "8";
+		String prot = "3";
+		String sodium = "820";
+		//format
+		String text = "Calories: "+cals+"\n";
+		text+="Fat: "+fat+"\n";
+		text+="Protein: "+prot+"\n";
+		text+="Sodium: "+sodium+"\n";
+		NutritionText.setText(text);
 	}
 	
 	public void UpdateUserRating(String recipeID, int rating) {
 		//send to db
 		//update avg rating from db
 	}
-
 }
