@@ -66,12 +66,7 @@ public class RecipeSearchPanel extends JPanel {
 		AddInclude.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				IncludedIngredients.put(includedCount, IncludeField.getText());
-				IncludeField.setText("");
-				includedCount++;
-				String text = IngredientNames(IncludedIngredients);
-				IncludeText.setText(text);
-				AddInclude.setEnabled(false);
+				addIncludedIngredient(AddInclude);
 			}
 		});
 		AddInclude.setEnabled(false);
@@ -101,12 +96,7 @@ public class RecipeSearchPanel extends JPanel {
 		AddExclude.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				ExcludedIngredients.put(excludedCount, ExcludeField.getText());
-				ExcludeField.setText("");
-				excludedCount++;
-				String text = IngredientNames(ExcludedIngredients);
-				ExcludeText.setText(text);
-				AddExclude.setEnabled(false);
+				addExcludedIngredient(AddExclude);
 			}
 		});
 		AddExclude.setEnabled(false);
@@ -390,4 +380,22 @@ public class RecipeSearchPanel extends JPanel {
 		//generate query to create / delete favorite
 	}
 	
+	public void addIncludedIngredient(JButton AddInclude) {
+		//compare string against DB to get an ID, replace includedCount with ID
+		IncludedIngredients.put(includedCount, IncludeField.getText());
+		IncludeField.setText("");
+		includedCount++;
+		String text = IngredientNames(IncludedIngredients);
+		IncludeText.setText(text);
+		AddInclude.setEnabled(false);
+	}
+	public void addExcludedIngredient(JButton AddExclude) {
+		//compare string against DB to get an ID, replace includedCount with ID
+		ExcludedIngredients.put(excludedCount, ExcludeField.getText());
+		ExcludeField.setText("");
+		excludedCount++;
+		String text = IngredientNames(ExcludedIngredients);
+		ExcludeText.setText(text);
+		AddExclude.setEnabled(false);
+	}
 }

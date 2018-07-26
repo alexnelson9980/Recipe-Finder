@@ -60,6 +60,7 @@ public class ProfilePage extends JPanel {
 	}
 	
 	public void populate(String ID) {
+		//db query
 		UserIDField.setText(ID);
 		passwordField.setText("password");
 		UserNameField.setText("Doug");

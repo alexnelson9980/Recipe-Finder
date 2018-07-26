@@ -13,6 +13,7 @@ import java.beans.PropertyChangeEvent;
 public class RecipeView extends JScrollPane {
 
 	JLabel lblAppRating;
+	JLabel lblRecipeTitle;
 	JLabel AppRatingVal;
 	JLabel lblEpRating;
 	JLabel EpRatingVal;
@@ -27,9 +28,9 @@ public class RecipeView extends JScrollPane {
 	 */
 	
 	//TODO nutrition
-	public RecipeView(String recipeID) {
+	public RecipeView(String recipeID,String UserID) {
 		
-		JLabel lblRecipeTitle = new JLabel(recipeID);
+		lblRecipeTitle = new JLabel(recipeID); //change to title
 		setColumnHeaderView(lblRecipeTitle);
 		
 		JPanel panel = new JPanel();
@@ -86,12 +87,13 @@ public class RecipeView extends JScrollPane {
 		NutritionText.setBounds(603, 50, 152, 430);
 		panel.add(NutritionText);
 		
-		SetRecipeData(recipeID);
+		SetRecipeData(recipeID,UserID);
 
 	}
 	
-	public void SetRecipeData(String recipeID) {
-		//get from db
+	public void SetRecipeData(String recipeID, String UserID) {
+		//get from db using ID, userID
+		//lblRecipeTitle.setText(title);
 		MyRatingSpinner.setValue(3);
 		AppRatingVal.setText("2");
 		EpRatingVal.setText("4");

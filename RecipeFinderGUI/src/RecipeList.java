@@ -53,7 +53,7 @@ public class RecipeList extends JScrollPane {
 				 int row=table.rowAtPoint(arg0.getPoint());
 				 int col= table.columnAtPoint(arg0.getPoint());
 				 if ((arg0.getClickCount()>1)&&(col==0)) {
-					 RowClicked(row);
+					 RowClicked(row,ID);
 				 }
 				 if (col==1) {
 					 UpdateFavorite(row);
@@ -72,11 +72,13 @@ public class RecipeList extends JScrollPane {
 		};
 	}
 		
-	public void RowClicked(int RowNum)
+	public void RowClicked(int RowNum, String UserID)
 	{
 		String title = (String) table.getValueAt(RowNum, 0);
-		//use array to get recipeID
-		RecipeView recView = new RecipeView(title); //this will be ID
+		//use array to get recipeID based on rownum
+		String recipeID = title;
+		//create new view
+		RecipeView recView = new RecipeView(recipeID,UserID); 
 		if (MainWindow.tabbedPane.getTabCount() > 3)
 		{
 			MainWindow.tabbedPane.remove(3);

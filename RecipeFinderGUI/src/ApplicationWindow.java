@@ -54,7 +54,7 @@ public class ApplicationWindow {
 			CreateUserButton.setEnabled(false);
 			return;
 		}
-		if (PasswordField.getText().isEmpty()) {
+		if (PasswordField.getPassword().length<1) {
 			LogInButton.setEnabled(false);
 			CreateUserButton.setEnabled(false);
 			return;
@@ -64,6 +64,7 @@ public class ApplicationWindow {
 	}
 	
 	private void TryLogin(String ID, String password) {
+		//db query
 		MessageBox.setText("failed login "+ID+" "+password);
 		if (ID.equalsIgnoreCase("ABC")) {
 			OpenRecipeSearch(ID);
@@ -77,6 +78,7 @@ public class ApplicationWindow {
 	}
 	
 	private void TryCreateUser(String ID, String password) {
+		//db query
 		MessageBox.setText("attempted create user "+ID+" "+password);
 	}
 
