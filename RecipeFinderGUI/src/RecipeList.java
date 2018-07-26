@@ -9,6 +9,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class RecipeList extends JScrollPane {
 	private JTable table;
+	public int[] LoadedRecipeIDs;
 
 	/**
 	 * Create the panel.
@@ -21,7 +22,7 @@ public class RecipeList extends JScrollPane {
 		DefaultTableModel dataModel = new DefaultTableModel(
 			GetTableData(query),
 			new String[] {
-				"Name", "Favorite"
+				"Name", "Rating", "Favorite"
 			}
 		)
 		{
@@ -30,13 +31,13 @@ public class RecipeList extends JScrollPane {
 			 */
 			private static final long serialVersionUID = 1L;
 			Class[] columnTypes = new Class[] {
-				Object.class, Boolean.class
+				Object.class, Double.class, Boolean.class
 			};
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
 			boolean[] columnEditables = new boolean[] {
-				false, true
+				false, false,true
 			};
 			public boolean isCellEditable(int row, int column) {
 				return columnEditables[column];
@@ -63,10 +64,11 @@ public class RecipeList extends JScrollPane {
 	
 	public Object[][] GetTableData(String query){
 		//send to db
+		//set LoadedRecipeIDs to match index in table
 		//make visible grid and matching array with IDs
 		return new Object[][] {
-			{query, true},
-			{"Sandwich",true},
+			{query, 3.06, true},
+			{"Sandwich", 2.35, true},
 		};
 	}
 		

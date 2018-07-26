@@ -24,6 +24,8 @@ public class RecipeView extends JScrollPane {
 	/**
 	 * Create the panel.
 	 */
+	
+	//TODO nutrition
 	public RecipeView(String recipeID) {
 		
 		JLabel lblRecipeTitle = new JLabel(recipeID);
