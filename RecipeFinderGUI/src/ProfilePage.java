@@ -5,6 +5,7 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 
 public class ProfilePage extends JPanel {
 	private JPasswordField passwordField;
@@ -50,7 +51,7 @@ public class ProfilePage extends JPanel {
 		btnUpdate.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				UpdateUser(ID,UserNameField.getText(),passwordField.getPassword().toString());
+				UpdateUser(ID,UserNameField.getText(),new String(passwordField.getPassword()));
 			}
 		});
 		btnUpdate.setBounds(171, 234, 89, 23);
@@ -62,11 +63,30 @@ public class ProfilePage extends JPanel {
 	public void populate(String ID) {
 		//db query
 		UserIDField.setText(ID);
-		passwordField.setText("password");
-		UserNameField.setText("Doug");
+		try {
+		DBConnect.rs = DBConnect.st.executeQuery(Queries.User_Info(ID));
+		DBConnect.rs.next();
+		passwordField.setText(DBConnect.rs.getString("Password"));
+		UserNameField.setText(DBConnect.rs.getString("User_Name"));
+		}
+		catch (SQLException e) {
+			System.out.println("Error: " + e);
+			return;
+		}
+		catch (NullPointerException e) {
+			System.out.println("Error: " + e);
+		}
 	}
 	
 	public void UpdateUser(String ID, String Name, String Password) {
+		/*try {
+			DBConnect.st.executeUpdate(Queries.Update_User(ID, Name, Password));
+		}
+		catch (SQLException e) {
+			System.out.println("Error: " + e);
+			return;
+		}*/
+		Queries.Update_User(ID, Password, Name, 0, 1);
 		//send update to db
 	}
 }

@@ -2,6 +2,8 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -53,11 +55,15 @@ public class MainWindow {
 		JPanel SearchPanel = new RecipeSearchPanel(ID);
 		tabbedPane.addTab("Recipe Search", null, SearchPanel, null);
 		
-		JScrollPane FavoritePanel = new RecipeList(ID, FavoriteQuery(ID));
+		FavoriteTab FavoritePanel = new FavoriteTab(ID, FavoriteQuery(ID));
 		tabbedPane.addTab("My Favorites", null, FavoritePanel, null);
 		
 		JPanel ProfilePanel = new ProfilePage(ID);
-		tabbedPane.addTab("Profile", null, ProfilePanel, null);
+		tabbedPane.addTab("Profile", null, ProfilePanel, null);	
+		
+		RecipeList SearchResultPanel = new RecipeList(ID, null);
+		tabbedPane.addTab("Search Results", SearchResultPanel);
+
 	}
 	
 	public String FavoriteQuery(String ID) {

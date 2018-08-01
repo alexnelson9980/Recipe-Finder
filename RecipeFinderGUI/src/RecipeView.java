@@ -8,6 +8,8 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import java.awt.SystemColor;
 import java.beans.PropertyChangeListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.beans.PropertyChangeEvent;
 
 public class RecipeView extends JScrollPane {
@@ -28,9 +30,9 @@ public class RecipeView extends JScrollPane {
 	 */
 	
 	//TODO nutrition
-	public RecipeView(String recipeID,String UserID) {
+	public RecipeView(int recipeID,String UserID) {
 		
-		lblRecipeTitle = new JLabel(recipeID); //change to title
+		lblRecipeTitle = new JLabel(); //change to title
 		setColumnHeaderView(lblRecipeTitle);
 		
 		JPanel panel = new JPanel();
@@ -44,7 +46,7 @@ public class RecipeView extends JScrollPane {
 		MyRatingSpinner = new JSpinner();
 		MyRatingSpinner.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent arg0) {
-				UpdateUserRating(recipeID, (int) MyRatingSpinner.getValue());
+				//UpdateUserRating(recipeID, (int) MyRatingSpinner.getValue());
 			}
 		});
 		MyRatingSpinner.setModel(new SpinnerNumberModel(0, 0, 5, 1));
@@ -56,15 +58,15 @@ public class RecipeView extends JScrollPane {
 		panel.add(lblAppRating);
 		
 		AppRatingVal = new JLabel("0");
-		AppRatingVal.setBounds(205, 11, 46, 14);
+		AppRatingVal.setBounds(215, 11, 46, 14);
 		panel.add(AppRatingVal);
 		
 		lblEpRating = new JLabel("Epicurious Rating:");
-		lblEpRating.setBounds(224, 11, 120, 14);
+		lblEpRating.setBounds(244, 11, 120, 14);
 		panel.add(lblEpRating);
 		
 		EpRatingVal = new JLabel("0");
-		EpRatingVal.setBounds(332, 11, 46, 14);
+		EpRatingVal.setBounds(352, 11, 46, 14);
 		panel.add(EpRatingVal);
 		
 		IngredientsText = new JTextPane();
@@ -91,7 +93,42 @@ public class RecipeView extends JScrollPane {
 
 	}
 	
-	public void SetRecipeData(String recipeID, String UserID) {
+	public void SetRecipeData(int recipeID, String UserID) {
+		
+		Object[] output = Queries.Get_Recipe_Info(recipeID, UserID);
+		String Classifications = (String)output[0];
+		ResultSet rs = (ResultSet)output[1];
+		try {
+			rs.next();
+			
+			//Set nutrition info
+			String calories = rs.getString("Calories");
+			String sodium = rs.getString("Sodium");
+			String fat = rs.getString("Fat");
+			String protein = rs.getString("Protein");
+			String text = "Calories: "+calories+"\n";
+			text+="Fat: "+fat+"\n";
+			text+="Protein: "+protein+"\n";
+			text+="Sodium: "+sodium+"\n";
+			NutritionText.setText(text);
+			
+			//Set rating info
+			MyRatingSpinner.setValue((int)output[2]);
+			Double temp = rs.getDouble("User_Rating");
+			AppRatingVal.setText(temp.toString());
+			temp = rs.getDouble("Epicurious_Rating");
+			EpRatingVal.setText(temp.toString());
+			
+			IngredientsText.setText(rs.getString("Prepared_Ingredients"));
+			DescriptionText.setText(rs.getString("Description"));
+			DirectionsText.setText(rs.getString("Instructions"));
+			
+
+			
+		} catch (SQLException e) {
+			System.out.println(e);
+		}
+		/*
 		//get from db using ID, userID
 		//lblRecipeTitle.setText(title);
 		MyRatingSpinner.setValue(3);
@@ -100,7 +137,7 @@ public class RecipeView extends JScrollPane {
 		IngredientsText.setText("2 slices of bread \n 1 tbsp peanut butter \n 1 tbsp jam");
 		DescriptionText.setText("The classic all american meal.");
 		DirectionsText.setText("Spread liquid ingredients evenly on bread. \n Enjoy.");
-		LoadNutritionText(recipeID);
+		//LoadNutritionText(recipeID);*/
 		
 	}
 	
