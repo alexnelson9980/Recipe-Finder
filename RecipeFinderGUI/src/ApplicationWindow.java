@@ -11,13 +11,16 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+
 import javax.swing.JTextArea;
 import java.awt.Color;
 import java.awt.SystemColor;
 
 public class ApplicationWindow {
 
-	private JFrame frmRecipeFinderLogin;
+	public JFrame frmRecipeFinderLogin;
 	private JTextField UserIDField;
 	private JPasswordField PasswordField;
 	private JButton LogInButton;
@@ -65,21 +68,51 @@ public class ApplicationWindow {
 	
 	private void TryLogin(String ID, String password) {
 		//db query
-		MessageBox.setText("failed login "+ID+" "+password);
-		if (ID.equalsIgnoreCase("ABC")) {
-			OpenRecipeSearch(ID);
+		
+		try {
+			DBConnect.rs = DBConnect.st.executeQuery(Queries.Login(ID, password));
+			if (!DBConnect.rs.next()) {
+				MessageBox.setText("Invalid User ID or Password");
+				return;
+			}
+			else {
+				OpenRecipeSearch(ID);
+				frmRecipeFinderLogin.dispose();
+			}
 		}
+		catch (SQLException e) {
+			System.out.println("Error: " + e);
+			return;
+		}
+		
 	}
 	
 	private void OpenRecipeSearch(String ID) {
 		MainWindow newMain = new MainWindow(ID);
-		newMain.frmRecipeFinder.setVisible(true);
-		
+		newMain.frmRecipeFinder.setVisible(true);		
 	}
 	
 	private void TryCreateUser(String ID, String password) {
+		/*
+		try {
+			DBConnect.st.executeUpdate(Queries.Create_User(ID, "", password));
+		}
+		catch (SQLIntegrityConstraintViolationException e) {
+			MessageBox.setText("User ID taken");
+			return;
+		}
+		catch (SQLException e) {
+			System.out.println("Error: " + e);
+			return;
+		}*/
+		if (Queries.Update_User(ID, password, "", 0, 0)) {
+			MessageBox.setText("Account created succesfully");
+		}
+		else {
+			MessageBox.setText("User ID taken");
+		}
 		//db query
-		MessageBox.setText("attempted create user "+ID+" "+password);
+		//MessageBox.setText("Account created succesfully");
 	}
 
 	/**
@@ -104,7 +137,7 @@ public class ApplicationWindow {
 		LogInButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				TryLogin(UserIDField.getText(),PasswordField.getText());
+				TryLogin(UserIDField.getText(),new String(PasswordField.getPassword()));
 			}
 		});
 		LogInButton.setEnabled(false);
@@ -115,7 +148,7 @@ public class ApplicationWindow {
 		CreateUserButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				TryCreateUser(UserIDField.getText(),PasswordField.getText());
+				TryCreateUser(UserIDField.getText(),new String(PasswordField.getPassword()));
 			}
 		});
 		CreateUserButton.setEnabled(false);

@@ -17,6 +17,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.JToggleButton;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -31,11 +33,17 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import java.beans.PropertyChangeListener;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.beans.PropertyChangeEvent;
 
 public class RecipeSearchPanel extends JPanel {
 	private JTextField IncludeField;
 	private JTextField ExcludeField;
+	private JTable IncludeTable;
+	DefaultTableModel IncludeModel;
+	private JTable ExcludeTable;
+	DefaultTableModel ExcludeModel;
 	private JTextPane IncludeText;
 	private JTextPane ExcludeText;
 	public Hashtable<Integer,String> IncludedIngredients = new Hashtable<Integer,String>();
@@ -47,11 +55,15 @@ public class RecipeSearchPanel extends JPanel {
 	public String[] Cats_Names;
 	public boolean[] Cats_Fav;
 	DefaultTableModel CatModel;
+	private RecipeSearchPanel searchPanel;
+	private JButton AddInclude;
+	private JButton AddExclude;
 	
 	/**
 	 * Create the panel.
 	 */
 	public RecipeSearchPanel(String ID) {
+		searchPanel = this;
 		setLayout(null);
 		
 		JLabel label = new JLabel("Categories");
@@ -62,11 +74,15 @@ public class RecipeSearchPanel extends JPanel {
 		lblIngredientsInclude.setBounds(37, 43, 172, 14);
 		add(lblIngredientsInclude);
 		
-		JButton AddInclude = new JButton("+");
+		AddInclude = new JButton("+");
 		AddInclude.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				addIncludedIngredient(AddInclude);
+				if (!AddInclude.isEnabled())
+					return;
+				IngredientLookupDialog lookup = new IngredientLookupDialog(IncludeField.getText(), 1, searchPanel);
+				lookup.setVisible(true);
+				//addIncludedIngredient(AddInclude);
 			}
 		});
 		AddInclude.setEnabled(false);
@@ -92,11 +108,15 @@ public class RecipeSearchPanel extends JPanel {
 		lblIngredientExclude.setBounds(37, 212, 172, 14);
 		add(lblIngredientExclude);
 		
-		JButton AddExclude = new JButton("+");
+		AddExclude = new JButton("+");
 		AddExclude.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				addExcludedIngredient(AddExclude);
+				if (!AddExclude.isEnabled())
+					return;
+				IngredientLookupDialog lookup = new IngredientLookupDialog(ExcludeField.getText(), 2, searchPanel);
+				lookup.setVisible(true);
+				//addExcludedIngredient(AddExclude);
 			}
 		});
 		AddExclude.setEnabled(false);
@@ -260,16 +280,102 @@ public class RecipeSearchPanel extends JPanel {
 				GetSearchResults(ID,vals,IncludedIngredients,ExcludedIngredients,cat);
 			}
 		});
-		
+		/*
 		IncludeText = new JTextPane();
 		IncludeText.setEditable(false);
 		IncludeText.setBounds(36, 97, 246, 111);
 		add(IncludeText);
+		*/
+		IncludeTable = new JTable();
+		String[] InclCol = {"ID", "Ingredient"};
+		IncludeModel = new DefaultTableModel(
+				new Object[][] {
+				}
+				,InclCol) {
+			boolean[] columnEditable = new boolean [] {
+					false
+			};
+			public boolean isCellEditable(int row, int col) {
+				return false;
+			}
+			
+			Class[] columnTypes = new Class[] {
+					int.class, String.class
+			};
+			public Class getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
+		};
 		
+		IncludeModel.setColumnIdentifiers(InclCol);
+		IncludeTable.setModel(IncludeModel);
+		IncludeTable.removeColumn(IncludeTable.getColumnModel().getColumn(0));
+		JScrollPane scrollInclude = new JScrollPane();
+		scrollInclude.setBounds(36, 97, 246, 111);
+		add(scrollInclude);
+		scrollInclude.setViewportView(IncludeTable);
+		
+		IncludeTable.addMouseListener(new MouseAdapter()
+        {
+			 @Override
+				public void mouseClicked(MouseEvent arg0) {
+				 int row=IncludeTable.rowAtPoint(arg0.getPoint());
+				 int btn = arg0.getButton();
+				 if (btn==MouseEvent.BUTTON3) {
+					 IncludeModel.removeRow(row);
+					 return;
+				 }
+			 }
+        });
+		
+		/*
 		ExcludeText = new JTextPane();
 		ExcludeText.setEditable(false);
 		ExcludeText.setBounds(37, 266, 246, 111);
 		add(ExcludeText);
+		*/
+		
+		ExcludeTable = new JTable();
+		String[] ExclCol = {"ID", "Ingredient"};
+		ExcludeModel = new DefaultTableModel(
+				new Object[][] {
+				}
+				,ExclCol) {
+			boolean[] columnEditable = new boolean [] {
+					false
+			};
+			public boolean isCellEditable(int row, int col) {
+				return false;
+			}
+			
+			Class[] columnTypes = new Class[] {
+					int.class, String.class
+			};
+			public Class getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
+		};
+		
+		ExcludeModel.setColumnIdentifiers(ExclCol);
+		ExcludeTable.setModel(ExcludeModel);
+		ExcludeTable.removeColumn(ExcludeTable.getColumnModel().getColumn(0));
+		JScrollPane scrollExclude = new JScrollPane();
+		scrollExclude.setBounds(36, 266, 246, 111);
+		add(scrollExclude);
+		scrollExclude.setViewportView(ExcludeTable);
+		
+		ExcludeTable.addMouseListener(new MouseAdapter()
+        {
+			 @Override
+				public void mouseClicked(MouseEvent arg0) {
+				 int row=ExcludeTable.rowAtPoint(arg0.getPoint());
+				 int btn = arg0.getButton();
+				 if (btn==MouseEvent.BUTTON3) {
+					 ExcludeModel.removeRow(row);
+					 return;
+				 }
+			 }
+        });
 		
 		CatTable = new JTable();
 		//InclCatsTable = GetFavoriteCategories(ID);
@@ -298,11 +404,13 @@ public class RecipeSearchPanel extends JPanel {
 		CatModel.setColumnIdentifiers(columns);
 		CatTable.setModel(CatModel);
 		CatTable.setBounds(554, 104, 182, 264);
-		JScrollPane scroll = new JScrollPane();
-		scroll.setSize(184, 262);
-		scroll.setLocation(554, 104);
-		add(scroll);
-		scroll.setViewportView(CatTable);
+		JScrollPane scrollCat = new JScrollPane();
+		scrollCat.setSize(184, 262);
+		scrollCat.setLocation(554, 104);
+		add(scrollCat);
+		scrollCat.setViewportView(CatTable);
+		
+
 		//add(new JScrollPane(CatTable));
 		GetFavoriteCategories(CatModel);
 		CatTable.addMouseListener(new MouseAdapter()
@@ -331,11 +439,13 @@ public class RecipeSearchPanel extends JPanel {
 		//generate query
 		String query = "PB&J";
 		RecipeList list = new RecipeList(ID, query);
-		if (MainWindow.tabbedPane.getTabCount() > 3)
+		/*if (MainWindow.tabbedPane.getTabCount() > 3)
 		{
 			MainWindow.tabbedPane.remove(3);
-		}
-			MainWindow.tabbedPane.addTab("Search Results", list);
+		}*/
+			//MainWindow.tabbedPane.addTab("Search Results", list);
+			MainWindow.tabbedPane.insertTab("Search Results", null, list, null, 3);
+			MainWindow.tabbedPane.remove(4);
 			MainWindow.tabbedPane.setSelectedIndex(3);
 	}
 	
@@ -348,10 +458,43 @@ public class RecipeSearchPanel extends JPanel {
 	}
 	
 	public void GetCategories(String UserID) {
+		long count;
+		try {
+			DBConnect.rs = DBConnect.st.executeQuery(Queries.Get_Categories_Count());
+			DBConnect.rs.next();
+			count = (long)DBConnect.rs.getObject(1);
+			Cats_Names = new String[(int)count + 1];
+			Cats_Names[0] = "";
+			
+			DBConnect.rs = DBConnect.st.executeQuery(Queries.Get_Categories());
+			int ix = 0;
+			while (DBConnect.rs.next()) {
+				ix++;
+				String name = (String)DBConnect.rs.getObject("Title");
+				Cats_Names[ix] = name;
+			}
+			Arrays.sort(Cats_Names);
+			Cats_Fav = new boolean[(int)count + 1];
+			Arrays.fill(Cats_Fav, false);
+			
+			DBConnect.rs = DBConnect.st.executeQuery(Queries.Get_Favorite_Categories(UserID));
+			while (DBConnect.rs.next()) {
+				String name = (String)DBConnect.rs.getObject("Classification_Title");
+				for (int i = 1; i < (int)count; i++) {
+					if (name.equals(Cats_Names[i])) {
+						Cats_Fav[i] = true;
+						break;
+					}
+				}
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("Error: " + e);
+			return;
+		}
 		//load from db
 		//...
-		Cats_Names = new String[]{null,"Lunch","Dinner","Breakfast","Dessert"};
-		Cats_Fav = new boolean[] {false,true,false,false,false};
+		//Cats_Names = new String[]{"","Lunch","Dinner","Breakfast","Dessert"};
 	}
 	public void LoadComboBox(JComboBox combo) {
 		DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>(Cats_Names);
@@ -362,6 +505,10 @@ public class RecipeSearchPanel extends JPanel {
 		//index in combobox matches index in name, id, and fav array
 		String name = Cats_Names[index];
 		boolean fav = Cats_Fav[index];
+		for (int i=0; i<CatModel.getRowCount(); i++) {
+			if (name.equals(CatModel.getValueAt(i, 0)))
+				return;
+		}
 		CatModel.addRow(new Object[] {name,fav});
 	}
 	
@@ -380,22 +527,32 @@ public class RecipeSearchPanel extends JPanel {
 		//generate query to create / delete favorite
 	}
 	
-	public void addIncludedIngredient(JButton AddInclude) {
+	public void addIncludedIngredient(Object[] array) {
 		//compare string against DB to get an ID, replace includedCount with ID
-		IncludedIngredients.put(includedCount, IncludeField.getText());
-		IncludeField.setText("");
-		includedCount++;
-		String text = IngredientNames(IncludedIngredients);
-		IncludeText.setText(text);
+		//IncludedIngredients.put(includedCount, IncludeField.getText());
+		for (int i = 0; i < IncludeModel.getRowCount(); i++) {
+			if (array[1].equals(IncludeModel.getValueAt(i,  1)))
+					return;
+		}
+		//IncludeField.setText("");
+		//includedCount++;
+		//String text = IngredientNames(IncludedIngredients);
+		//IncludeText.setText(text);
 		AddInclude.setEnabled(false);
+		IncludeModel.addRow(array);
 	}
-	public void addExcludedIngredient(JButton AddExclude) {
+	public void addExcludedIngredient(Object[] array) {
 		//compare string against DB to get an ID, replace includedCount with ID
-		ExcludedIngredients.put(excludedCount, ExcludeField.getText());
-		ExcludeField.setText("");
-		excludedCount++;
-		String text = IngredientNames(ExcludedIngredients);
-		ExcludeText.setText(text);
+		//ExcludedIngredients.put(excludedCount, ExcludeField.getText());
+		for (int i = 0; i < ExcludeModel.getRowCount(); i++) {
+			if (array[1].equals(ExcludeModel.getValueAt(i,  1)))
+					return;
+		}
+		//ExcludeField.setText("");
+		//excludedCount++;
+		//String text = IngredientNames(ExcludedIngredients);
+		//ExcludeText.setText(text);
 		AddExclude.setEnabled(false);
+		ExcludeModel.addRow(array);
 	}
 }
