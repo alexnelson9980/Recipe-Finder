@@ -11,8 +11,10 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.Statement;
 
 import javax.swing.JTextArea;
 import java.awt.Color;
@@ -70,14 +72,15 @@ public class ApplicationWindow {
 		//db query
 		
 		try {
-			DBConnect.rs = DBConnect.st.executeQuery(Queries.Login(ID, password));
-			if (!DBConnect.rs.next()) {
-				MessageBox.setText("Invalid User ID or Password");
-				return;
+			Statement st = DBConnect.connection.createStatement();
+			ResultSet rs = st.executeQuery(Queries.Login(ID, password));
+			if (rs.next()) {
+				OpenRecipeSearch(ID);
+				frmRecipeFinderLogin.dispose();		
 			}
 			else {
-				OpenRecipeSearch(ID);
-				frmRecipeFinderLogin.dispose();
+				MessageBox.setText("Invalid User ID or Password");
+				return;
 			}
 		}
 		catch (SQLException e) {

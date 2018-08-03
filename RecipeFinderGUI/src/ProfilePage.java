@@ -2,10 +2,13 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
 import javax.swing.JButton;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class ProfilePage extends JPanel {
 	private JPasswordField passwordField;
@@ -64,10 +67,11 @@ public class ProfilePage extends JPanel {
 		//db query
 		UserIDField.setText(ID);
 		try {
-		DBConnect.rs = DBConnect.st.executeQuery(Queries.User_Info(ID));
-		DBConnect.rs.next();
-		passwordField.setText(DBConnect.rs.getString("Password"));
-		UserNameField.setText(DBConnect.rs.getString("User_Name"));
+			Statement st = DBConnect.connection.createStatement();
+			ResultSet rs = st.executeQuery(Queries.User_Info(ID));
+			rs.next();
+			passwordField.setText(rs.getString("Password"));
+			UserNameField.setText(rs.getString("User_Name"));
 		}
 		catch (SQLException e) {
 			System.out.println("Error: " + e);

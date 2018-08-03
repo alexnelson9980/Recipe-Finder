@@ -107,16 +107,67 @@ public class Queries {
 	//Add or remove a recipe from a user's favorite
 	public static void Update_Favorite_Recipe(String userId, int recipeId, int isDel) {
 		try {
-			System.out.println(userId + " " + recipeId + " " + isDel);
-		CallableStatement myCallStmt = DBConnect.connection.prepareCall("{call editFavoriteRecipe(?,?,?)}");
-		myCallStmt.setString(1, userId);
-		myCallStmt.setInt(2, recipeId);
-		myCallStmt.setInt(3, isDel);
-		
-		myCallStmt.execute();
+			CallableStatement myCallStmt = DBConnect.connection.prepareCall("{call editFavoriteRecipe(?,?,?)}");
+			myCallStmt.setString(1, userId);
+			myCallStmt.setInt(2, recipeId);
+			myCallStmt.setInt(3, isDel);
+			
+			myCallStmt.execute();
 		} catch (SQLException e) {
 			System.out.println(e);
 		}
 	}
 	
+	//Update a user's recipe score
+	public static int Update_User_Recipe_Score(String userId, int recipeId, int score, int isDel) {
+		try {
+			CallableStatement myCallStmt = DBConnect.connection.prepareCall("{call updateRating(?,?,?,?)}");
+			myCallStmt.setString(1, userId);
+			myCallStmt.setInt(2, recipeId);
+			myCallStmt.setInt(3, score);
+			myCallStmt.setInt(4, isDel);
+			
+			myCallStmt.execute();
+			ResultSet rs = myCallStmt.getResultSet();
+			rs.next();
+			rs.getInt(1);
+			return rs.getInt(1);
+		} catch (SQLException e) {
+			System.out.println(e);
+			return 0;
+		}
+	}
+	
+	public static String Get_Classification_List(String userId) {
+		return 
+			"SELECT " +
+				"Belongs_To.Classification_Title, " +
+				"Count(BELONGS_TO.Recipe_ID) AS 'Num_Recipes', " +
+				"CASE " +
+					"WHEN Fave_Class.Classification_Title IS NOT NULL " +
+						"THEN 1 ELSE 0 " +
+				"END AS 'Is_Favorite' " +
+			"FROM " +
+			    "BELONGS_TO " +
+				"LEFT OUTER JOIN FAVORITE_CLASSIFICATION Fave_Class " +
+						"ON Fave_Class.Classification_Title = BELONGS_TO.Classification_Title " +
+			            "AND Fave_Class.User_ID = " + userId + " " +
+			"GROUP BY " +
+					"BELONGS_TO.Classification_Title " +
+			"ORDER BY " +
+				"Is_Favorite DESC, Num_Recipes DESC";
+	}
+	
+	public static void Edit_Favorite_Class(String userId, String classification, int isDel) {
+		try {
+			CallableStatement myCallStmt = DBConnect.connection.prepareCall("{call editFavoriteClass(?,?,?)}");
+			myCallStmt.setString(1, userId);
+			myCallStmt.setString(2, classification);
+			myCallStmt.setInt(3, isDel);
+			
+			myCallStmt.execute();
+		} catch (SQLException e) {
+			System.out.println(e);
+		}
+	}
 }

@@ -3,7 +3,9 @@ import java.awt.Dialog;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -119,10 +121,11 @@ public class IngredientLookupDialog extends JDialog {
 	
 	private void populateTable(String searchString) {
 		try {
-			DBConnect.rs = DBConnect.st.executeQuery(Queries.Get_Ingredients(searchString));
-			while (DBConnect.rs.next()) {
-				int ID = (int)DBConnect.rs.getObject("Ingredient_ID");
-				String name = (String)DBConnect.rs.getObject("Name");
+			Statement st = DBConnect.connection.createStatement();
+			ResultSet rs = st.executeQuery(Queries.Get_Ingredients(searchString));
+			while (rs.next()) {
+				int ID = (int)rs.getObject("Ingredient_ID");
+				String name = (String)rs.getObject("Name");
 				ingModel.addRow(new Object[] {ID, name});
 			}
 		}

@@ -11,6 +11,10 @@ import java.beans.PropertyChangeListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.beans.PropertyChangeEvent;
+import javax.swing.JButton;
+import javax.swing.SwingConstants;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class RecipeView extends JScrollPane {
 
@@ -44,29 +48,25 @@ public class RecipeView extends JScrollPane {
 		panel.add(lblMyRating);
 		
 		MyRatingSpinner = new JSpinner();
-		MyRatingSpinner.addPropertyChangeListener(new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent arg0) {
-				//UpdateUserRating(recipeID, (int) MyRatingSpinner.getValue());
-			}
-		});
+
 		MyRatingSpinner.setModel(new SpinnerNumberModel(0, 0, 5, 1));
 		MyRatingSpinner.setBounds(77, 8, 45, 20);
 		panel.add(MyRatingSpinner);
 		
 		lblAppRating = new JLabel("App Rating:");
-		lblAppRating.setBounds(142, 11, 72, 14);
+		lblAppRating.setBounds(212, 11, 72, 14);
 		panel.add(lblAppRating);
 		
 		AppRatingVal = new JLabel("0");
-		AppRatingVal.setBounds(215, 11, 46, 14);
+		AppRatingVal.setBounds(285, 11, 46, 14);
 		panel.add(AppRatingVal);
 		
 		lblEpRating = new JLabel("Epicurious Rating:");
-		lblEpRating.setBounds(244, 11, 120, 14);
+		lblEpRating.setBounds(314, 11, 120, 14);
 		panel.add(lblEpRating);
 		
 		EpRatingVal = new JLabel("0");
-		EpRatingVal.setBounds(352, 11, 46, 14);
+		EpRatingVal.setBounds(422, 11, 46, 14);
 		panel.add(EpRatingVal);
 		
 		IngredientsText = new JTextPane();
@@ -88,6 +88,15 @@ public class RecipeView extends JScrollPane {
 		NutritionText.setBackground(SystemColor.info);
 		NutritionText.setBounds(603, 50, 152, 430);
 		panel.add(NutritionText);
+		
+		JButton btnUpdateScore = new JButton("Update");
+		btnUpdateScore.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				UpdateUserRating(UserID, recipeID);
+			}
+		});
+		btnUpdateScore.setBounds(125, 8, 80, 20);
+		panel.add(btnUpdateScore);
 		
 		SetRecipeData(recipeID,UserID);
 
@@ -155,8 +164,10 @@ public class RecipeView extends JScrollPane {
 		NutritionText.setText(text);
 	}
 	
-	public void UpdateUserRating(String recipeID, int rating) {
+	public void UpdateUserRating(String UserID, int recipeID) {
 		//send to db
 		//update avg rating from db
+		int avgRating = Queries.Update_User_Recipe_Score(UserID, recipeID, (int)MyRatingSpinner.getValue(), 0);
+		AppRatingVal.setText(Integer.toString(avgRating));
 	}
 }

@@ -33,9 +33,15 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import java.beans.PropertyChangeListener;
+import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.beans.PropertyChangeEvent;
+import javax.swing.JViewport;
+import javax.swing.plaf.basic.BasicComboPopup;
+import java.lang.reflect.Field;
+
 
 public class RecipeSearchPanel extends JPanel {
 	private JTextField IncludeField;
@@ -58,6 +64,9 @@ public class RecipeSearchPanel extends JPanel {
 	private RecipeSearchPanel searchPanel;
 	private JButton AddInclude;
 	private JButton AddExclude;
+	private DefaultComboBoxModel model;
+	private int otherCatsIndex;
+	private JComboBox CategoriesCombo;
 	
 	/**
 	 * Create the panel.
@@ -137,20 +146,28 @@ public class RecipeSearchPanel extends JPanel {
 		ExcludeField.setColumns(10);
 		ExcludeField.setBounds(37, 235, 119, 20);
 		add(ExcludeField);
-		
-		JComboBox CategoriesCombo = new JComboBox();
-		CategoriesCombo.addActionListener(new ActionListener() {
+	
+		//GetCategories(ID);
+		model = new DefaultComboBoxModel();
+		GetCategories(ID);
+		CategoriesCombo = new JComboBox(model);
+			CategoriesCombo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
+				
 				int index = CategoriesCombo.getSelectedIndex();
-				if (index > 0) {
-					AddCatToTable(index);
-				}
+				String val = (String)CategoriesCombo.getSelectedItem();
+				if (index == 0 || index == otherCatsIndex)
+					return;
+				AddCatToTable(index, val);
+				
 			}
 		});
+			
+		
 		CategoriesCombo.setBounds(554, 63, 184, 30);
 		add(CategoriesCombo);
-		GetCategories(ID);
-		LoadComboBox(CategoriesCombo);
+		//LoadComboBox(CategoriesCombo);
+		
 		
 		JSpinner CalorieMin = new JSpinner();
 		CalorieMin.setEnabled(false);
@@ -382,7 +399,6 @@ public class RecipeSearchPanel extends JPanel {
 		String[] columns = {"Cat","Fav?"};
 		CatModel = new DefaultTableModel(
 				new Object[][] {
-					{null, null},
 				}
 				,columns) {
 			boolean[] columnEditable = new boolean[] {
@@ -412,7 +428,7 @@ public class RecipeSearchPanel extends JPanel {
 		
 
 		//add(new JScrollPane(CatTable));
-		GetFavoriteCategories(CatModel);
+		//GetFavoriteCategories(CatModel);
 		CatTable.addMouseListener(new MouseAdapter()
         {
 			 @Override
@@ -430,7 +446,6 @@ public class RecipeSearchPanel extends JPanel {
 
 			 }
         });
-		
 	
 	}
 	
@@ -456,62 +471,60 @@ public class RecipeSearchPanel extends JPanel {
 		}
 		return out;
 	}
-	
+		
 	public void GetCategories(String UserID) {
-		long count;
-		try {
-			DBConnect.rs = DBConnect.st.executeQuery(Queries.Get_Categories_Count());
-			DBConnect.rs.next();
-			count = (long)DBConnect.rs.getObject(1);
-			Cats_Names = new String[(int)count + 1];
-			Cats_Names[0] = "";
-			
-			DBConnect.rs = DBConnect.st.executeQuery(Queries.Get_Categories());
-			int ix = 0;
-			while (DBConnect.rs.next()) {
-				ix++;
-				String name = (String)DBConnect.rs.getObject("Title");
-				Cats_Names[ix] = name;
-			}
-			Arrays.sort(Cats_Names);
-			Cats_Fav = new boolean[(int)count + 1];
-			Arrays.fill(Cats_Fav, false);
-			
-			DBConnect.rs = DBConnect.st.executeQuery(Queries.Get_Favorite_Categories(UserID));
-			while (DBConnect.rs.next()) {
-				String name = (String)DBConnect.rs.getObject("Classification_Title");
-				for (int i = 1; i < (int)count; i++) {
-					if (name.equals(Cats_Names[i])) {
-						Cats_Fav[i] = true;
-						break;
-					}
+		
+			try {
+				model.addElement("**Favorites**");
+				int otherIxCount = 1;
+				Statement st = DBConnect.connection.createStatement();
+				ResultSet rs = st.executeQuery(Queries.Get_Classification_List(UserID));
+				while (rs.next()) {
+					if (rs.getInt("Is_Favorite") == 0) break;
+					model.addElement(rs.getString("Classification_Title"));
+					otherIxCount++;
 				}
+				otherCatsIndex = otherIxCount;
+				model.addElement("**Others**");
+				do {
+					model.addElement(rs.getString("Classification_Title"));
+				} while (rs.next());
+				
+			} catch (SQLException e) {
+				System.out.println(e);
 			}
-		}
-		catch (SQLException e) {
-			System.out.println("Error: " + e);
-			return;
-		}
+			
 		//load from db
 		//...
 		//Cats_Names = new String[]{"","Lunch","Dinner","Breakfast","Dessert"};
 	}
-	public void LoadComboBox(JComboBox combo) {
-		DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>(Cats_Names);
-		combo.setModel(model);
-	}
 	
-	public void AddCatToTable(int index) {
+	class MyComboModel extends DefaultComboBoxModel<String> {
+		public MyComboModel() {}
+		
+		@Override
+		public void setSelectedItem(Object item) {
+			if (item.toString().startsWith("**"))
+				return;
+			super.setSelectedItem(item);
+		}
+	}
+	/*
+	public void LoadComboBox(JComboBox combo) {
+		//model = new MyComboModel<String>();
+		combo.setModel(model);
+	}*/
+	
+	public void AddCatToTable(int index, String name) {
 		//index in combobox matches index in name, id, and fav array
-		String name = Cats_Names[index];
-		boolean fav = Cats_Fav[index];
 		for (int i=0; i<CatModel.getRowCount(); i++) {
 			if (name.equals(CatModel.getValueAt(i, 0)))
 				return;
 		}
+		boolean fav = (index < otherCatsIndex);
 		CatModel.addRow(new Object[] {name,fav});
 	}
-	
+	/*
 	public void GetFavoriteCategories(DefaultTableModel model){
 		//run GetCategories first to populate arrs
 		model.removeRow(0);
@@ -521,9 +534,35 @@ public class RecipeSearchPanel extends JPanel {
 				model.addRow(new Object[] {Cats_Names[i],Cats_Fav[i]});
 			}
 		}	
-	}
+	}*/
 	
 	public void SetFavoriteCategory(String name, boolean favorite, String UserID) {
+		int isDel;
+		if (favorite) isDel = 0;
+		else isDel = 1;
+		Queries.Edit_Favorite_Class(UserID, name, isDel);
+		CategoriesCombo.setSelectedIndex(0);
+		if (favorite) {
+			for (int i = otherCatsIndex + 1; i < model.getSize(); i++) {
+				if (model.getElementAt(i).equals(name)) {
+					model.removeElementAt(i);
+					model.insertElementAt(name, otherCatsIndex);
+					otherCatsIndex++;
+					break;
+				}
+				
+			}
+		}
+		else {
+			for (int i = 0; i< otherCatsIndex; i++) {
+				if (model.getElementAt(i).equals(name)) {
+					model.removeElementAt(i);
+					model.insertElementAt(name, otherCatsIndex);
+					otherCatsIndex--;
+					break;
+				}
+			}
+		}
 		//generate query to create / delete favorite
 	}
 	
