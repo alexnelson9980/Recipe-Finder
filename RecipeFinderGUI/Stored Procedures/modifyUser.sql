@@ -8,7 +8,7 @@ proc_label:BEGIN
 
 /* Deleting user */
 IF iIsDelete = 1 THEN
-	DELETE FROM User where User_ID = iUserID;
+	DELETE FROM USER where User_ID = iUserID;
 	LEAVE proc_label;
 END IF;
 
@@ -23,12 +23,12 @@ END IF;
 /* Make sure user ID not already taken */
 SELECT count(*) INTO foundRows
 FROM (
-	SELECT User_Id FROM USER
-	WHERE USER_id = iUserID
+	SELECT User_ID FROM USER
+	WHERE User_ID = iUserID
 	
 	UNION ALL
 	
-	SELECT User_Id FROM rates_recipe
+	SELECT User_ID FROM rates_recipe
 	WHERE User_ID = iUserID
 	) AS T1;
 	
@@ -37,7 +37,7 @@ IF foundRows > 0 THEN
 END IF;
 
 /* Checks passed, insert the user */
-INSERT INTO User (User_ID, User_Name, Password)
+INSERT INTO USER (User_ID, User_Name, Password)
 Values(iUserID, iUserName, iUserPassword);
 
 END$$

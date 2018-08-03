@@ -17,12 +17,12 @@ END IF;
 
 /* We are adding a favorite recipe */
 IF NOT EXISTS(
-	SELECT 1 FROM Favorite_Recipe
+	SELECT 1 FROM FAVORITE_RECIPE
 	WHERE User_ID = iUserID AND Recipe_ID = iRecipeID
 	)
 THEN
 
-	INSERT INTO Favorite_Recipe (User_ID, Recipe_ID)
+	INSERT INTO FAVORITE_RECIPE (User_ID, Recipe_ID)
 	VALUES (iUserID, iRecipeID);
 
 END IF;

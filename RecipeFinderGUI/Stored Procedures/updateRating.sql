@@ -40,7 +40,7 @@ LEFT OUTER JOIN (
 	FROM RATES_RECIPE
 	WHERE Recipe_ID = iRecipeID
 	GROUP BY Recipe_ID
-	) New_Rating ON Recipe.Recipe_ID = New_Rating.Recipe_ID
+	) New_Rating ON RECIPE.Recipe_ID = New_Rating.Recipe_ID
 SET RECIPE.User_Rating = New_Rating.Rating
 WHERE RECIPE.Recipe_ID = iRecipeID;
 
