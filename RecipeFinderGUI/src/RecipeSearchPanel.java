@@ -41,6 +41,7 @@ import java.beans.PropertyChangeEvent;
 import javax.swing.JViewport;
 import javax.swing.plaf.basic.BasicComboPopup;
 import java.lang.reflect.Field;
+import javax.swing.JCheckBox;
 
 
 public class RecipeSearchPanel extends JPanel {
@@ -67,6 +68,7 @@ public class RecipeSearchPanel extends JPanel {
 	private DefaultComboBoxModel model;
 	private int otherCatsIndex;
 	private JComboBox CategoriesCombo;
+	private JCheckBox chckbxPartialSearch;
 	
 	/**
 	 * Create the panel.
@@ -275,26 +277,65 @@ public class RecipeSearchPanel extends JPanel {
 		SearchBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
+				String includedIngredients = "";
+				for (int i=0; i<IncludeModel.getRowCount(); i++) {
+					if (includedIngredients == "") includedIngredients = Integer.toString((int)IncludeModel.getValueAt(i, 0));
+					else includedIngredients = includedIngredients + "," + Integer.toString((int)IncludeModel.getValueAt(i, 0));
+				}
+				if (includedIngredients == "") includedIngredients = "-1";
+				
+				String excludedIngredients = "";
+				for (int i=0; i<ExcludeModel.getRowCount(); i++) {
+					if (excludedIngredients == "") excludedIngredients = Integer.toString((int)ExcludeModel.getValueAt(i, 0));
+					else excludedIngredients = excludedIngredients + "," + Integer.toString((int)ExcludeModel.getValueAt(i, 0));
+				}
+				if (includedIngredients == "") includedIngredients = "-1";
+				
+				String categories = "";
+				for (int i=0; i<CatModel.getRowCount(); i++) {
+					if (categories == "") categories = (String)CatModel.getValueAt(i, 0);
+					else categories = categories + "," + (String)CatModel.getValueAt(i, 0);
+				}
+				if (categories == "") categories = "-1";
+				
 				Dictionary<String,Integer> vals = new Hashtable<String,Integer>();
 				if (CalorieMin.isEnabled()){
 					vals.put("CalorieMin", (Integer) CalorieMin.getValue());
 					vals.put("CalorieMax", (Integer)CalorieMax.getValue());
 				}
+				else {
+					vals.put("CalorieMin", -1);
+					vals.put("CalorieMax", -1);
+				}
 				if (ProteinMin.isEnabled()){
 					vals.put("ProteinMin", (Integer) ProteinMin.getValue());
 					vals.put("ProteinMax", (Integer) ProteinMax.getValue());
+				}
+				else {
+					vals.put("ProteinMin", -1);
+					vals.put("ProteinMax", -1);
 				}
 				if (FatMin.isEnabled()){
 					vals.put("FatMin", (Integer) FatMin.getValue());
 					vals.put("FatMax", (Integer) FatMax.getValue());
 				}
+				else {
+					vals.put("FatMin", -1);
+					vals.put("FatMax", -1);
+				}
 				if (SodiumMin.isEnabled()){
 					vals.put("SodiumMin", (Integer) SodiumMin.getValue());
 					vals.put("SodiumMax", (Integer) SodiumMax.getValue());
 				}
+				else {
+					vals.put("SodiumMin", -1);
+					vals.put("SodiumMax", -1);
+				}
+				
 
-				String cat = (String) CategoriesCombo.getSelectedItem();
-				GetSearchResults(ID,vals,IncludedIngredients,ExcludedIngredients,cat);
+				GetSearchResults(ID,includedIngredients, excludedIngredients, categories, vals);
+				//GetSearchResults(ID,vals,IncludedIngredients,ExcludedIngredients,cat);
+				//GetSearchResults(ID,Queries.Get_Recipes_From_Search());
 			}
 		});
 		/*
@@ -426,6 +467,19 @@ public class RecipeSearchPanel extends JPanel {
 		add(scrollCat);
 		scrollCat.setViewportView(CatTable);
 		
+		JButton btnFavCatSearch = new JButton("Fav Cat Quick Search");
+		btnFavCatSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				GetSearchResults(ID, Queries.Get_Recipes_From_Favorite_Categories(ID));
+			}
+		});
+		btnFavCatSearch.setBounds(554, 379, 184, 25);
+		add(btnFavCatSearch);
+		
+		chckbxPartialSearch = new JCheckBox("<HTML>Include partial matches for recipes <br/> in which you do not have all ingredients</HTML>");
+		chckbxPartialSearch.setBounds(37, 406, 255, 58);
+		add(chckbxPartialSearch);
+		
 
 		//add(new JScrollPane(CatTable));
 		//GetFavoriteCategories(CatModel);
@@ -450,9 +504,9 @@ public class RecipeSearchPanel extends JPanel {
 	}
 	
 	
-	public void GetSearchResults(String ID, Dictionary NutriVals, Dictionary Included, Dictionary Excluded, String Cat ){
+	//public void GetSearchResults(String ID, Dictionary NutriVals, Dictionary Included, Dictionary Excluded, String Cat ){
+	public void GetSearchResults(String ID, String query) {
 		//generate query
-		String query = "PB&J";
 		RecipeList list = new RecipeList(ID, query);
 		/*if (MainWindow.tabbedPane.getTabCount() > 3)
 		{
@@ -462,6 +516,20 @@ public class RecipeSearchPanel extends JPanel {
 			MainWindow.tabbedPane.insertTab("Search Results", null, list, null, 3);
 			MainWindow.tabbedPane.remove(4);
 			MainWindow.tabbedPane.setSelectedIndex(3);
+	}
+	
+	public void GetSearchResults(String ID, String includedIngredients, String excludedIngredients, String categories, Dictionary<String,Integer> nutrition) {
+		ResultSet rs;
+		if (chckbxPartialSearch.isSelected())
+			rs = Queries.Get_Recipes_From_Search(ID, includedIngredients, excludedIngredients, categories, nutrition);
+		else
+			rs = Queries.Get_Recipes_From_Search_Restrictive(ID, includedIngredients, excludedIngredients, categories, nutrition);
+		
+		RecipeList list = new RecipeList(ID, rs);
+		
+		MainWindow.tabbedPane.insertTab("Search Results", null, list, null, 3);
+		MainWindow.tabbedPane.remove(4);
+		MainWindow.tabbedPane.setSelectedIndex(3);
 	}
 	
 	public String IngredientNames(Hashtable<Integer,String> dict) {

@@ -15,7 +15,7 @@ public class FavoriteTab extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public FavoriteTab(String ID, String query) {
+	public FavoriteTab(String ID) {
 		setLayout(null);
 		
 		RecipeList FavoriteList = new RecipeList(ID, Queries.Get_Favorite_Recipes(ID));

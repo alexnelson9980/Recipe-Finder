@@ -16,11 +16,30 @@ public class RecipeList extends JScrollPane {
 	public int[] LoadedRecipeIDs;
 	private DefaultTableModel dataModel;
 
+	
+	
+	public RecipeList(String ID, ResultSet rs) {
+		initialize(ID);
+		GetTableData(rs);
+		
+	}
 	/**
 	 * Create the panel.
 	 */
 	public RecipeList(String ID, String query) {
-		
+		initialize(ID);
+		if (query == "") return;
+		ResultSet rs = null;
+		try {
+		Statement st = DBConnect.connection.createStatement();
+		rs = st.executeQuery(query);
+		} catch (SQLException e) {
+			System.out.println(e);
+		}
+		GetTableData(rs);
+	}
+	
+	private void initialize(String ID) {
 		table = new JTable();
 		table.setCellSelectionEnabled(true);
 		setViewportView(table);
@@ -28,7 +47,7 @@ public class RecipeList extends JScrollPane {
 			//GetTableData(query),
 			null,
 			new String[] {
-				"ID", "Name", "EpiCuriousRating", "User Rating", "Favorite"
+				"ID", "Name", "EpiCuriousRating", "App Rating", "Favorite"
 			}
 		)
 		{
@@ -49,7 +68,6 @@ public class RecipeList extends JScrollPane {
 				return columnEditables[column];
 			}
 		};
-		GetTableData(query);
 		table.setModel(dataModel);
 		table.removeColumn(table.getColumnModel().getColumn(0));
 		table.getColumnModel().getColumn(0).setPreferredWidth(272);
@@ -70,16 +88,14 @@ public class RecipeList extends JScrollPane {
          });
 	}
 	
-	public void GetTableData(String query){
+	public void GetTableData(ResultSet rs){
 		dataModel.setRowCount(0);
-		if (query == null) return;
+		if (rs == null) return;
 		//send to db
 		//set LoadedRecipeIDs to match index in table
 		//make visible grid and matching array with IDs
 		
 		try {
-			Statement st = DBConnect.connection.createStatement();
-			ResultSet rs = st.executeQuery(query);
 			while (rs.next()) {
 				Object[] row = new Object[5];
 				row[0]=rs.getInt(1);
@@ -87,20 +103,15 @@ public class RecipeList extends JScrollPane {
 				row[2]=rs.getDouble(3);
 				row[3]=rs.getDouble(4);
 				int isFav=rs.getInt(5);
-				if (isFav == 1) row[4] = true;
+				if (isFav > 0) row[4] = true;
 				else row[4] = false;
 				dataModel.addRow(row);			
 			}
 		} catch (SQLException e) {
 			System.out.println(e);
 		}
-		//dataModel.addRow(new Object[] {1, query, 3.06, 4.2, true});
-		//dataModel.addRow(new Object[] {2, "Sandwich", 2.35, 3.7, true});
-		/*return new Object[][] {
-			{1, query, 3.06, 4.2, true},
-			{2, "Sandwich", 2.35, 3.7, true},
-		};*/
 	}
+	
 		
 	public void RowClicked(int RowNum, String UserID)
 	{
@@ -129,7 +140,14 @@ public class RecipeList extends JScrollPane {
 	}
 	
 	public void RefreshFavorites(String ID) {
-		GetTableData(Queries.Get_Favorite_Recipes(ID));
+		ResultSet rs = null;
+		try {
+			Statement st = DBConnect.connection.createStatement();
+			rs = st.executeQuery(Queries.Get_Favorite_Recipes(ID));
+			} catch (SQLException e) {
+				System.out.println(e);
+			}
+			GetTableData(rs);
 		
 	}
 

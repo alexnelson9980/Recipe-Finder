@@ -55,18 +55,15 @@ public class MainWindow {
 		JPanel SearchPanel = new RecipeSearchPanel(ID);
 		tabbedPane.addTab("Recipe Search", null, SearchPanel, null);
 		
-		FavoriteTab FavoritePanel = new FavoriteTab(ID, FavoriteQuery(ID));
+		FavoriteTab FavoritePanel = new FavoriteTab(ID);
 		tabbedPane.addTab("My Favorites", null, FavoritePanel, null);
 		
 		JPanel ProfilePanel = new ProfilePage(ID);
 		tabbedPane.addTab("Profile", null, ProfilePanel, null);	
 		
-		RecipeList SearchResultPanel = new RecipeList(ID, null);
+		RecipeList SearchResultPanel = new RecipeList(ID, "");
 		tabbedPane.addTab("Search Results", SearchResultPanel);
 
 	}
 	
-	public String FavoriteQuery(String ID) {
-		return "Macaroni and Cheese";
-	}
 }

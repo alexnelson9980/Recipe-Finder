@@ -2,6 +2,7 @@ import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Dictionary;
 
 public class Queries {
 	//User Related Queries
@@ -168,6 +169,93 @@ public class Queries {
 			myCallStmt.execute();
 		} catch (SQLException e) {
 			System.out.println(e);
+		}
+	}
+	
+	public static String Get_Recipes_From_Favorite_Categories(String userId) {
+		return 
+			"SELECT " +
+				"Recipe.Recipe_ID, " +
+				"Recipe.Title, " +
+				"Recipe.Epicurious_Rating, " +
+				"RECIPE.User_Rating, " +
+				"IF(User_Favorites.Recipe_ID, 1, 0) " +
+			"FROM " +
+				"Recipe " +
+				"INNER JOIN ( " +
+					"SELECT " +
+						"Belongs_To.Recipe_ID AS 'Recipe_ID', " +
+						"COUNT(DISTINCT Belongs_To.Classification_Title) AS 'Num_Favorites' " +
+					"FROM " +
+						"Belongs_To " +
+						"INNER JOIN Favorite_Classification " +
+							"ON Belongs_To.Classification_Title = Favorite_Classification.Classification_Title " +
+					"WHERE " +
+						"Favorite_Classification.User_ID = " + userId + " " +
+					"GROUP BY Belongs_To.Recipe_ID " +
+				") Fav_Cat_Recipe ON Fav_Cat_Recipe.Recipe_ID = Recipe.Recipe_ID " +
+				"LEFT JOIN ( " +
+						"SELECT FAVORITE_RECIPE.Recipe_ID " +
+				        "FROM " + 
+							"FAVORITE_RECIPE " +
+						"WHERE " + 
+							"FAVORITE_RECIPE.User_ID = " + userId + " " +
+				") User_Favorites ON recipe.recipe_ID = User_Favorites.Recipe_ID " +
+			"ORDER BY " +
+				"Fav_Cat_Recipe.Num_Favorites DESC;";
+	}
+	
+	public static String Get_Recipes_From_Search() {
+		return "";
+	}
+	public static ResultSet Get_Recipes_From_Search(String userId, String includedIngredients, String excludedIngredients, String categories, Dictionary<String,Integer> nutrition) {
+		try {
+			CallableStatement myCallStmt = DBConnect.connection.prepareCall("{call recipeSearch(?,?,?,?,?,?,?,?,?,?,?,?)}");
+			myCallStmt.setString(1, userId);
+			myCallStmt.setString(2, includedIngredients);
+			myCallStmt.setString(3, excludedIngredients);
+			myCallStmt.setString(4, categories);
+			myCallStmt.setDouble(5, nutrition.get("SodiumMax"));
+			myCallStmt.setDouble(6, nutrition.get("SodiumMin"));
+			myCallStmt.setInt(7, nutrition.get("CalorieMax"));
+			myCallStmt.setInt(8, nutrition.get("CalorieMin"));
+			myCallStmt.setDouble(9, nutrition.get("FatMax"));
+			myCallStmt.setDouble(10, nutrition.get("FatMin"));
+			myCallStmt.setDouble(11, nutrition.get("ProteinMax"));
+			myCallStmt.setDouble(12, nutrition.get("ProteinMin"));
+			
+			myCallStmt.execute();
+			ResultSet rs = myCallStmt.getResultSet();
+			return rs;
+
+		} catch (SQLException e) {
+			System.out.println(e);
+			return null;
+		}
+	}
+	public static ResultSet Get_Recipes_From_Search_Restrictive(String userId, String includedIngredients, String excludedIngredients, String categories, Dictionary<String,Integer> nutrition) {
+		try {
+			CallableStatement myCallStmt = DBConnect.connection.prepareCall("{call recipeSearchRestrictive(?,?,?,?,?,?,?,?,?,?,?,?)}");
+			myCallStmt.setString(1, userId);
+			myCallStmt.setString(2, includedIngredients);
+			myCallStmt.setString(3, excludedIngredients);
+			myCallStmt.setString(4, categories);
+			myCallStmt.setDouble(5, nutrition.get("SodiumMax"));
+			myCallStmt.setDouble(6, nutrition.get("SodiumMin"));
+			myCallStmt.setInt(7, nutrition.get("CalorieMax"));
+			myCallStmt.setInt(8, nutrition.get("CalorieMin"));
+			myCallStmt.setDouble(9, nutrition.get("FatMax"));
+			myCallStmt.setDouble(10, nutrition.get("FatMin"));
+			myCallStmt.setDouble(11, nutrition.get("ProteinMax"));
+			myCallStmt.setDouble(12, nutrition.get("ProteinMin"));
+			
+			myCallStmt.execute();
+			ResultSet rs = myCallStmt.getResultSet();
+			return rs;
+
+		} catch (SQLException e) {
+			System.out.println(e);
+			return null;
 		}
 	}
 }
