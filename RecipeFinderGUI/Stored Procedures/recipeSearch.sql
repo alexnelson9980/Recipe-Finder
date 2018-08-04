@@ -14,10 +14,11 @@ FROM
 	RECIPE
 	INNER JOIN CONTAINS ON RECIPE.Recipe_ID = CONTAINS.Recipe_ID
 	INNER JOIN BASE_INGREDIENT ON CONTAINS.Ingredient_ID = BASE_INGREDIENT.Ingredient_ID
+    INNER JOIN TYPE_OF ON TYPE_OF.Specific_ID = BASE_INGREDIENT.Ingredient_ID
     LEFT OUTER JOIN (
 		SELECT DISTINCT Recipe_ID as Exclude_ID 
-        FROM CONTAINS 
-        WHERE FIND_IN_SET(Ingredient_ID, iExcludeIngredients)
+        FROM CONTAINS INNER JOIN TYPE_OF ON TYPE_OF.Specific_ID = CONTAINS.Ingredient_ID
+        WHERE (FIND_IN_SET(TYPE_OF.Specific_ID, iExcludeIngredients) OR FIND_IN_SET(TYPE_OF.Generic_ID, iExcludeIngredients))
 	) ExcludeTable ON RECIPE.Recipe_ID = ExcludeTable.Exclude_ID 
 	LEFT OUTER JOIN BELONGS_TO ON RECIPE.Recipe_ID = BELONGS_TO.Recipe_ID
 	LEFT OUTER JOIN (
@@ -29,7 +30,7 @@ FROM
     
     WHERE 
 		/* Filter on ingredients */
-		(iIncludeIngredients = -1 OR FIND_IN_SET(BASE_INGREDIENT.Ingredient_ID, iIncludeIngredients))
+		(iIncludeIngredients = -1 OR FIND_IN_SET(TYPE_OF.Specific_ID, iIncludeIngredients) OR FIND_IN_SET(TYPE_OF.Generic_ID, iIncludeIngredients))
         AND ExcludeTable.Exclude_ID IS NULL
 		/*AND (iExcludeIngredients = '-1' OR NOT FIND_IN_SET(Base_Ingredient.Ingredient_ID, iExcludeIngredients))*/
 	
