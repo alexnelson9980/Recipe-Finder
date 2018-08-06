@@ -13,9 +13,21 @@ public class DBConnect {
 	String databaseURL;
 	String password;
 	
+	public DBConnect() {
+		DBSettings(local);
+	}
+	
+	public DBConnect(String host, String database, String user, String pass) {
+		databasePrefix=database;
+		ID=user;
+		hostName=host;
+		databaseURL="jdbc:mysql://" + hostName + "/" + databasePrefix + "?autoReconnect=true&useSSL=false";
+		password=pass;
+	}
+	
 	
 	public boolean connect() {
-		DBSettings(local);
+		//DBSettings(local);
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			connection = DriverManager.getConnection(databaseURL, ID, password);
@@ -34,7 +46,7 @@ public class DBConnect {
 	
 	private void DBSettings(boolean local) {
 		if (local) {
-			databasePrefix="recipe_finder";
+			databasePrefix="recipetest";
 			ID="root";
 			hostName="localhost";
 			databaseURL="jdbc:mysql://" + hostName + "/" + databasePrefix + "?autoReconnect=true&useSSL=false";
