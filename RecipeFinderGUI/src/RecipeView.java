@@ -111,20 +111,29 @@ public class RecipeView extends JScrollPane {
 			rs.next();
 			
 			//Set nutrition info
-			String calories = rs.getString("Calories");
-			String sodium = rs.getString("Sodium");
-			String fat = rs.getString("Fat");
-			String protein = rs.getString("Protein");
-			String text = "Calories: "+calories+"\n";
-			text+="Fat: "+fat+"\n";
-			text+="Protein: "+protein+"\n";
-			text+="Sodium: "+sodium+"\n";
+			int calories = rs.getInt("Calories");
+			Double sodium = rs.getDouble("Sodium");
+			Double fat = rs.getDouble("Fat");
+			Double protein = rs.getDouble("Protein");
+			
+			String text = "Calories: ";
+			if (calories == -1) text += "\n";
+			else text+=calories+"\n";
+			text+="Fat: ";
+			if (fat == -1) text += "\n";
+			else text+=fat+"\n";
+			text+="Protein: ";
+			if (protein == -1) text += "\n";
+			else text+=protein+"\n";
+			text+="Sodium: ";
+			if (sodium == -1) text += "\n";
+			else text+=sodium+"\n";
 			NutritionText.setText(text);
 			
 			//Set rating info
 			MyRatingSpinner.setValue((int)output[2]);
 			Double temp = rs.getDouble("User_Rating");
-			AppRatingVal.setText(temp.toString());
+			if (temp != -1) AppRatingVal.setText(temp.toString());
 			temp = rs.getDouble("Epicurious_Rating");
 			EpRatingVal.setText(temp.toString());
 			

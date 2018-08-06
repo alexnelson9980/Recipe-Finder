@@ -34,7 +34,7 @@ public class DBConnect {
 	
 	private void DBSettings(boolean local) {
 		if (local) {
-			databasePrefix="recipetest";
+			databasePrefix="recipe_finder";
 			ID="root";
 			hostName="localhost";
 			databaseURL="jdbc:mysql://" + hostName + "/" + databasePrefix + "?autoReconnect=true&useSSL=false";

@@ -25,7 +25,7 @@ public class Queries {
 			else if (myCallStmt.getInt(6)==0) return true;
 			else return false;
 		} catch (SQLException e) {
-			System.out.println(e);
+			System.out.println("Update_User SP: " + e);
 			return false;
 		}
 	}
@@ -81,7 +81,7 @@ public class Queries {
 	public static String Get_Favorite_Recipes(String userId) {
 		return "SELECT RECIPE.Recipe_ID, RECIPE.Title, RECIPE.Epicurious_Rating, RECIPE.User_Rating, 1 AS Is_Favorite "
 				+ "FROM RECIPE INNER JOIN FAVORITE_RECIPE ON RECIPE.Recipe_ID = FAVORITE_RECIPE.Recipe_ID "
-				+ "WHERE FAVORITE_RECIPE.User_ID =" + userId + ";";
+				+ "WHERE FAVORITE_RECIPE.User_ID = '" + userId + "';";
 	}
 	
 	//Get information for single recipe
@@ -100,7 +100,7 @@ public class Queries {
 			int rating = myCallStmt.getInt(4);
 			return new Object[] {classOut, rs, rating};
 		} catch (SQLException e) {
-			System.out.println(e);
+			System.out.println("Get_Recipe_Info SP: " + e);
 			return null;
 		}
 	}
@@ -115,7 +115,7 @@ public class Queries {
 			
 			myCallStmt.execute();
 		} catch (SQLException e) {
-			System.out.println(e);
+			System.out.println("Update_Favorite_Recipe SP: " + e);
 		}
 	}
 	
@@ -134,7 +134,7 @@ public class Queries {
 			rs.getInt(1);
 			return rs.getInt(1);
 		} catch (SQLException e) {
-			System.out.println(e);
+			System.out.println("Update_User_Recipe_Score SP: " + e);
 			return 0;
 		}
 	}
@@ -152,7 +152,7 @@ public class Queries {
 			    "BELONGS_TO " +
 				"LEFT OUTER JOIN FAVORITE_CLASSIFICATION Fave_Class " +
 						"ON Fave_Class.Classification_Title = BELONGS_TO.Classification_Title " +
-			            "AND Fave_Class.User_ID = " + userId + " " +
+			            "AND Fave_Class.User_ID = '" + userId + "' " +
 			"GROUP BY " +
 					"BELONGS_TO.Classification_Title " +
 			"ORDER BY " +
@@ -168,7 +168,7 @@ public class Queries {
 			
 			myCallStmt.execute();
 		} catch (SQLException e) {
-			System.out.println(e);
+			System.out.println("Edit_Favorite_Class SP: " + e);
 		}
 	}
 	
@@ -191,7 +191,7 @@ public class Queries {
 						"INNER JOIN Favorite_Classification " +
 							"ON Belongs_To.Classification_Title = Favorite_Classification.Classification_Title " +
 					"WHERE " +
-						"Favorite_Classification.User_ID = " + userId + " " +
+						"Favorite_Classification.User_ID = '" + userId + "' " +
 					"GROUP BY Belongs_To.Recipe_ID " +
 				") Fav_Cat_Recipe ON Fav_Cat_Recipe.Recipe_ID = Recipe.Recipe_ID " +
 				"LEFT JOIN ( " +
@@ -199,7 +199,7 @@ public class Queries {
 				        "FROM " + 
 							"FAVORITE_RECIPE " +
 						"WHERE " + 
-							"FAVORITE_RECIPE.User_ID = " + userId + " " +
+							"FAVORITE_RECIPE.User_ID = '" + userId + "' " +
 				") User_Favorites ON recipe.recipe_ID = User_Favorites.Recipe_ID " +
 			"ORDER BY " +
 				"Fav_Cat_Recipe.Num_Favorites DESC;";
@@ -229,7 +229,7 @@ public class Queries {
 			return rs;
 
 		} catch (SQLException e) {
-			System.out.println(e);
+			System.out.println("Get_Recipes_From_Search SP: " + e);
 			return null;
 		}
 	}
@@ -254,7 +254,7 @@ public class Queries {
 			return rs;
 
 		} catch (SQLException e) {
-			System.out.println(e);
+			System.out.println("Get_Recipes_From_Search_Restrictive SP: " + e);
 			return null;
 		}
 	}

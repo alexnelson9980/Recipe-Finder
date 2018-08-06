@@ -101,14 +101,16 @@ public class RecipeList extends JScrollPane {
 				row[0]=rs.getInt(1);
 				row[1]=rs.getString(2);
 				row[2]=rs.getDouble(3);
-				row[3]=rs.getDouble(4);
+				Double appRating = rs.getDouble(4);
+				if (appRating != -1) row[3]=appRating;
+				//row[3]=rs.getDouble(4);
 				int isFav=rs.getInt(5);
 				if (isFav > 0) row[4] = true;
 				else row[4] = false;
 				dataModel.addRow(row);			
 			}
 		} catch (SQLException e) {
-			System.out.println(e);
+			System.out.println("RecipeList GetTableData: " + e);
 		}
 	}
 	
