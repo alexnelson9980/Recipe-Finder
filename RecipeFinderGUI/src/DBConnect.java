@@ -27,7 +27,6 @@ public class DBConnect {
 	
 	
 	public boolean connect() {
-		//DBSettings(local);
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			connection = DriverManager.getConnection(databaseURL, ID, password);
@@ -46,7 +45,8 @@ public class DBConnect {
 	
 	private void DBSettings(boolean local) {
 		if (local) {
-			databasePrefix="recipetest";
+			//EDIT SETTINGS HERE TO RUN FROM Main.java
+			databasePrefix="recipe_finder";
 			ID="root";
 			hostName="localhost";
 			databaseURL="jdbc:mysql://" + hostName + "/" + databasePrefix + "?autoReconnect=true&useSSL=false";

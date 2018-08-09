@@ -210,7 +210,7 @@ public class Queries {
 	}
 	public static ResultSet Get_Recipes_From_Search(String userId, String includedIngredients, String excludedIngredients, String categories, Dictionary<String,Integer> nutrition) {
 		try {
-			CallableStatement myCallStmt = DBConnect.connection.prepareCall("{call recipeSearch(?,?,?,?,?,?,?,?,?,?,?,?)}");
+			CallableStatement myCallStmt = DBConnect.connection.prepareCall("{call newRecipeSearch(?,?,?,?,?,?,?,?,?,?,?,?)}");
 			myCallStmt.setString(1, userId);
 			myCallStmt.setString(2, includedIngredients);
 			myCallStmt.setString(3, excludedIngredients);
@@ -235,7 +235,7 @@ public class Queries {
 	}
 	public static ResultSet Get_Recipes_From_Search_Restrictive(String userId, String includedIngredients, String excludedIngredients, String categories, Dictionary<String,Integer> nutrition) {
 		try {
-			CallableStatement myCallStmt = DBConnect.connection.prepareCall("{call recipeSearchRestrictive(?,?,?,?,?,?,?,?,?,?,?,?)}");
+			CallableStatement myCallStmt = DBConnect.connection.prepareCall("{call newRecipeSearchRestrictive(?,?,?,?,?,?,?,?,?,?,?,?)}");
 			myCallStmt.setString(1, userId);
 			myCallStmt.setString(2, includedIngredients);
 			myCallStmt.setString(3, excludedIngredients);
