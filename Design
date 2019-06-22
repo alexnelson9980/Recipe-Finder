@@ -1,0 +1,19 @@
+User creation
+  User enters name and password
+  Successful creation logs the user in and navigates to recipe search
+User login
+  User enters name and password
+  Successful login opens recipe search
+Recipe search
+  User enters included and excluded ingredients
+  User selects nutritional ranges
+  User selects classifications from a list
+  User submits search and is taken to recipe listing
+Recipe listing
+  Used for both displaying search results and displaying favorited recipes
+  Recipe titles and overall ratings appear in a table
+  User clicks a recipe title to enter single recipe view
+Single recipe view
+  Recipe title, description, ratings, classifications, directions, and ingredients text appear on screen
+  User can rate the recipe or add as a favorite
+  Users can navigate backwards to recipe search
